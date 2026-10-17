@@ -5,6 +5,6 @@
    两项都填好后，密码验证走云端；留空则回落本地 passwords.js
    ============================================================ */
 window.SUPABASE_CONFIG = {
-  url: '',
-  anonKey: ''
+  url: 'https://ajtfelgnhginwlhpstbp.supabase.co',
+  anonKey: 'sb_publishable_XTF5V1wbJLq2Hp9RsIMFTw_UPtz_DEq'
 };
