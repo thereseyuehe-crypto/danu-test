@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F7F2E8">
+<title>你拿的是哪一版大女主剧本</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+--paper:#F7F2E8;--paper2:#EDE5D6;--ink:#1C1A17;--ink2:#5A5348;--ink3:#8C8478;
+--red:#9E2B25;--red2:#C0483C;--gold:#A8864E;--line:rgba(28,26,23,.14);--ok:#3B6D11;
+}
+html,body{background:#DCD3C2;color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+-webkit-text-size-adjust:100%}
+#app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--paper);
+padding-bottom:env(safe-area-inset-bottom);box-shadow:0 0 0 1px var(--line)}
+.page{padding:26px 20px 40px}
+.hidden{display:none!important}
+.center{text-align:center}
+
+/* 密码 */
+.lock{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:34px 26px}
+.lock .mark{width:52px;height:52px;border:1px solid var(--gold);border-radius:50%;
+display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--gold);margin-bottom:20px}
+.lock h1{font-size:23px;font-weight:600;letter-spacing:.03em;text-align:center}
+.lock .tip{font-size:13px;color:var(--ink3);margin-top:12px;text-align:center;line-height:1.8}
+.lock input{width:100%;max-width:320px;margin-top:32px;padding:15px 16px;text-align:center;
+font-family:inherit;font-size:17px;letter-spacing:.24em;border:1px solid var(--line);
+border-radius:3px;background:#fff;color:var(--ink);outline:none}
+.lock input:focus{border-color:var(--gold)}
+.lock input.err{border-color:var(--red2);animation:shake .32s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.lock .msg{font-size:13px;color:var(--red);height:20px;margin-top:12px;text-align:center}
+.lock .left{font-size:13px;color:var(--ink3);margin-top:6px;min-height:20px}
+.lock .warn{margin-top:26px;max-width:320px;font-size:11px;line-height:1.85;color:var(--ink3);
+border-top:1px solid var(--line);padding-top:18px;text-align:left}
+
+/* 封面 */
+.cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:44px 26px}
+.cover .kicker{font-size:11px;letter-spacing:.34em;color:var(--gold);margin-bottom:20px}
+.cover h1{font-size:30px;line-height:1.36;font-weight:600}
+.cover h1 em{font-style:normal;color:var(--red)}
+.cover .rule{width:32px;height:1px;background:var(--gold);margin:24px auto}
+.cover .sub{font-size:14px;line-height:1.95;color:var(--ink2);max-width:310px}
+.cover .meta{font-size:12px;color:var(--ink3);line-height:2.1;margin-top:26px}
+.btn{display:block;width:100%;max-width:300px;margin:26px auto 0;padding:16px 20px;
+background:var(--red);color:#F7F2E8;border:none;border-radius:2px;
+font-size:15px;letter-spacing:.14em;font-family:inherit;cursor:pointer}
+.btn:active{background:var(--red2)}
+.btn:disabled{background:#CFC5B2;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--red);border:1px solid var(--red);margin-top:12px}
+.btn.dark{background:var(--ink);color:var(--paper)}
+
+/* 答题 */
+.qhead{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);letter-spacing:.1em;margin-bottom:8px}
+.pbar{height:2px;background:var(--paper2);margin-bottom:32px}
+.pbar i{display:block;height:100%;background:var(--red);transition:width .3s}
+.qtitle{font-size:21px;line-height:1.6;font-weight:500;margin-bottom:9px}
+.qhint{font-size:12px;color:var(--ink3);margin-bottom:26px}
+.opt{display:block;width:100%;text-align:left;padding:15px 16px;margin-bottom:10px;
+background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:3px;
+font-family:inherit;font-size:15px;line-height:1.55;color:var(--ink);cursor:pointer}
+.opt:active{background:#fff;border-color:var(--gold)}
+.opt.sel{background:rgba(158,43,37,.06);border-color:var(--red)}
+.qfoot{display:flex;justify-content:space-between;align-items:center;margin-top:24px;min-height:36px}
+.qfoot button{background:none;border:none;font-family:inherit;font-size:13px;color:var(--ink3);cursor:pointer;padding:8px 0}
+.qfoot .lockbtn{color:var(--red);font-size:14px;letter-spacing:.1em}
+
+/* 结果 */
+.hero{text-align:center;padding:10px 0 24px}
+.hero .kicker{font-size:11px;letter-spacing:.3em;color:var(--gold);margin-bottom:16px}
+.hero .type{font-size:32px;font-weight:600;letter-spacing:.03em;line-height:1.25}
+.hero .title{font-size:15px;color:var(--red);margin-top:10px;letter-spacing:.06em}
+.hero .line{margin-top:22px;font-size:16px;line-height:1.8;font-weight:500}
+.badges{display:flex;justify-content:center;gap:7px;margin-top:20px;flex-wrap:wrap}
+.badge{font-size:12px;padding:5px 11px;border:1px solid var(--line);border-radius:2px;color:var(--ink2);background:rgba(255,255,255,.6)}
+.badge.hl{border-color:var(--red);color:var(--red)}
+.divider{height:1px;background:var(--line);margin:32px 0}
+.sec{margin-bottom:32px}
+.sec h3{font-size:12px;letter-spacing:.2em;color:var(--gold);margin-bottom:14px;font-weight:500}
+.sec p{font-size:15px;line-height:1.95;margin-bottom:14px}
+.sec p em{font-style:normal;color:var(--red);border-bottom:1px solid rgba(158,43,37,.3)}
+.quote{border-left:2px solid var(--red);padding:2px 0 2px 15px;font-size:15px;line-height:1.85}
+.stages{display:flex;flex-direction:column;gap:9px}
+.stage{padding:14px 15px;border:1px solid var(--line);border-radius:3px;background:rgba(255,255,255,.5)}
+.stage.on{border-color:var(--red);background:rgba(158,43,37,.05)}
+.stage h4{font-size:14px;font-weight:500;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+.stage h4 em{font-style:normal;font-size:11px;color:var(--red)}
+.stage p{font-size:13px;line-height:1.85;color:var(--ink2);margin:0}
+.acc{border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.acc summary{padding:14px 15px;font-size:13px;cursor:pointer;list-style:none;background:rgba(255,255,255,.5);color:var(--ink2)}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary:after{content:"＋";float:right;color:var(--gold)}
+.acc[open] summary:after{content:"－"}
+.acc .body{padding:2px 15px 15px}
+.acc li{font-size:13px;line-height:1.9;color:var(--ink2);margin-bottom:6px;list-style:none}
+.acc li.disc{color:var(--red)}
+#shot{width:100%;border:1px solid var(--line);display:block;background:#F7F2E8}
+.acts{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.acts button,.acts a{width:100%;padding:15px;border-radius:2px;font-family:inherit;font-size:15px;
+cursor:pointer;text-align:center;text-decoration:none;display:block;letter-spacing:.06em}
+.primary{background:var(--red);color:#F7F2E8;border:none}
+.secondary{background:transparent;color:var(--red);border:1px solid var(--red)}
+.grid8{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.g8item{padding:12px;border:1px solid var(--line);border-radius:3px;background:rgba(255,255,255,.5)}
+.g8item.on{border-color:var(--red);background:rgba(158,43,37,.06)}
+.g8item b{display:block;font-size:14px;font-weight:500;margin-bottom:4px}
+.g8item span{font-size:12px;color:var(--ink3)}
+.foot{margin-top:40px;text-align:center;font-size:11px;color:var(--ink3);line-height:1.9}
+
+/* 弹窗 */
+.mask{position:fixed;inset:0;background:rgba(28,26,23,.55);display:flex;align-items:center;
+justify-content:center;padding:24px;z-index:99}
+.modal{background:var(--paper);border-radius:6px;padding:28px 24px 22px;max-width:340px;width:100%;
+text-align:center;max-height:86vh;overflow:auto}
+.modal h4{font-size:18px;font-weight:600;margin-bottom:14px}
+.modal .mp{font-size:14px;line-height:1.95;color:var(--ink2);margin-bottom:22px;text-align:left}
+.modal .mp b{color:var(--red);font-weight:500}
+.modal .row{display:flex;gap:10px}
+.modal .row>*{flex:1;margin:0}
+.toast{position:fixed;left:50%;bottom:56px;transform:translateX(-50%);background:rgba(28,26,23,.92);
+color:#F7F2E8;font-size:13px;padding:11px 20px;border-radius:3px;z-index:200;opacity:0;
+transition:opacity .25s;pointer-events:none;max-width:82%;text-align:center;line-height:1.6}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="app"><div id="screen"></div></div>
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="passwords.js"></script>
+<script>
+/* ===================================================================
+   ① 密码区
+   优先级：Supabase 云端校验 > 本地 passwords.js 哈希
+   云端模式（部署到 GitHub Pages 后启用）：
+   - 密码和已用次数存云端数据库，跨设备、无痕模式都计数
+   - 本地模式：passwords.js 哈希 + localStorage 计数（仅本浏览器有效）
+   =================================================================== */
+function fnv(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*0x01000193)>>>0;}h^=s.length;h=(h*0x01000193)>>>0;h^=0x9e3779b9;h=(h*0x01000193)>>>0;h^=h>>>15;h=(h*0x2545f491)>>>0;return h>>>0;}
+
+/* ---------- Supabase 轻量客户端（无依赖，只用 RPC 接口） ---------- */
+const SB = (function(){
+  const cfg = (typeof window.SUPABASE_CONFIG==='object' && window.SUPABASE_CONFIG) || {};
+  if(!cfg.url || !cfg.anonKey) return null;
+  const base = cfg.url.replace(/\/+$/,'');
+  const headers = {
+    'apikey': cfg.anonKey,
+    'Authorization': 'Bearer ' + cfg.anonKey,
+    'Content-Type': 'application/json'
+  };
+  async function rpc(fn, body){
+    const r = await fetch(base + '/rest/v1/rpc/' + fn, {
+      method:'POST', headers: headers,
+      body: JSON.stringify(body||{})
+    });
+    if(!r.ok){
+      const t = await r.text().catch(()=> '');
+      throw new Error('SUPA ' + r.status + ' ' + t.slice(0,200));
+    }
+    return r.json();
+  }
+  return { rpc };
+})();
+
+const PWD_LIST  = (typeof window.PWD_HASH === 'object' && window.PWD_HASH) ? window.PWD_HASH : null;
+const PMAP      = (typeof window.PWD_MAP === 'object' && window.PWD_MAP) ? window.PWD_MAP : {};
+const MAX_TIMES = (typeof window.PWD_MAX === 'number' && window.PWD_MAX > 0) ? window.PWD_MAX : 3;
+const PWDSET = new Set(Array.isArray(PWD_LIST) ? PWD_LIST : []);
+
+if(SB){
+  console.log('[密码] 云端模式：Supabase 校验已启用');
+}else if(PWDSET.size){
+  console.log('[密码] 本地模式：已加载 ' + PWDSET.size + ' 个密码，每号限 ' + MAX_TIMES + ' 次');
+}else{
+  console.error('[密码] 密码表未加载 —— 请配置 config.js（云端）或放置 passwords.js（本地）');
+}
+const STORE_KEY = 'dnv_pwd_used';
+
+/* ===================================================================
+   ② 题库 —— 18题 / 5维度 / 8型 + 1隐藏型
+   场景全部换成当下年轻人的真实处境，选项去说教化
+   =================================================================== */
+const QUESTIONS=[
+ {d:'群聊',q:'群里有人在甩接龙红包。你第一反应是——',h:'手速和判断力同时受检。',o:[
+  {t:'抢完必须发个更大的回去',s:['H','E']},
+  {t:'抢到就行，发不发看心情',s:['B','C']},
+  {t:'等别人先抢，我看看情况',s:['G','A']},
+  {t:'不抢，嫌吵',s:['F','C']}]},
+ {d:'职场',q:'周五下午五点，老板在群里@你：「这个数据你今天能给我吗？」',h:'这句话的真实含义你已经翻译过来了。',o:[
+  {t:'秒回「好的」，然后打开电脑',s:['B','A']},
+  {t:'回「明天上午可以」——你确实做不完',s:['A','G']},
+  {t:'已读，等他先说别的',s:['F','E']},
+  {t:'回「我试试」，然后先放下',s:['C','H']}]},
+ {d:'社交',q:'聚会上有人喊「来一起拍张合照！」你——',h:'没有标准答案，只看你习惯当什么角色。',o:[
+  {t:'第一个凑过去，站在最中间',s:['C','E']},
+  {t:'站过去，但站边上',s:['D','G']},
+  {t:'配合拍，然后默默退出去',s:['F','B']},
+  {t:'帮所有人调整角度和站位，自己最后入镜',s:['H','A']}]},
+ {d:'关系',q:'喜欢一个人的聊天记录，你翻到最上面。',h:'你决定删掉还是留着。',o:[
+  {t:'全部截图存着，偶尔翻',s:['G','A']},
+  {t:'往上翻，看当初谁先开口的',s:['A','C']},
+  {t:'退出清空，眼不见心不烦',s:['F','D']},
+  {t:'留着，但再也不往上翻',s:['D','H']}]},
+ {d:'消费',q:'直播间喊「最后三单」。你的手指——',h:'这一刻没有赢家。',o:[
+  {t:'已经付款了，事后才觉得离谱',s:['C','A']},
+  {t:'加购物车，然后关掉app',s:['D','E']},
+  {t:'先看评论区有没有人说是广告',s:['G','B']},
+  {t:'算了一下这个月还剩多少额度',s:['B','F']}]},
+ {d:'职场',q:'同事把你做的方案改了交上去，被老板表扬了。',h:'你会怎么做。',o:[
+  {t:'当场说「那是我做的」',s:['A','C']},
+  {t:'不说，把证据截图留好',s:['G','A']},
+  {t:'无所谓，反正活是我干的',s:['F','H']},
+  {t:'下次主动问一句「要不要一起署名」',s:['H','E']}]},
+ {d:'表达',q:'领导在群里说：「这个方案谁想的？」群里安静了三秒。',h:'这题测的是你最自然的反应。',o:[
+  {t:'秒回「我」，不解释',s:['A','C']},
+  {t:'发了个举手的表情',s:['C','E']},
+  {t:'想让别人替你说，等着看有没有人开口',s:['G','D']},
+  {t:'过了一会儿私聊领导简单说两句',s:['H','B']}]},
+ {d:'亲密',q:'朋友跟你说：「我最近有点撑不住。」',h:'这句话的重量，取决于你是谁。',o:[
+  {t:'立刻回电话过来，现在就要聊',s:['E','H']},
+  {t:'回「我在」，然后认真听完',s:['H','E']},
+  {t:'过两天单独约她出来',s:['B','G']},
+  {t:'说实话，你需要先把自己的情绪收一收',s:['F','C']}]},
+ {d:'日常',q:'你的手机相册里，截图最多的是——',h:'不用想，选第一反应。',o:[
+  {t:'工作群里的表格和数据',s:['B','A']},
+  {t:'网课和待学清单',s:['G','D']},
+  {t:'搞笑视频和表情包',s:['C','E']},
+  {t:'啥都不截，我记在脑子里',s:['F','H']}]},
+ {d:'职场',q:'你最不想在群里看到的一句话是——',h:'这题有点冒犯，但它很准。',o:[
+  {t:'「谁方便接一下？」',s:['F','D']},
+  {t:'「辛苦了，注意休息」',s:['E','C']},
+  {t:'「这个需求再对齐一下」',s:['G','B']},
+  {t:'「明天能出吗？」',s:['A','H']}]},
+ {d:'自我',q:'同学聚会被问「你最近在做什么」。你——',h:'这题测的是你对自己的叙事。',o:[
+  {t:'在搞一个自己的项目，说得出来',s:['B','A']},
+  {t:'说得挺热闹，其实也没什么进展',s:['G','D']},
+  {t:'「就上班呗」，轻描淡写',s:['F','E']},
+  {t:'反问对方「你呢？」把话题转走',s:['C','H']}]},
+ {d:'关系',q:'一段关系里，你更像——',h:'凭直觉，不用想太久。',o:[
+  {t:'做决定的那个',s:['A','C']},
+  {t:'出主意的那个',s:['G','B']},
+  {t:'让事情好起来的那个',s:['H','E']},
+  {t:'待着就行，别吵就行',s:['F','D']}]},
+ {d:'情绪',q:'你朋友在深夜发来一大段抱怨。你的第一反应不是安慰，是——',h:'说实话。',o:[
+  {t:'「你是不是也这样想过？」',s:['A','G']},
+  {t:'「你先睡吧」，不想接',s:['F','H']},
+  {t:'认真回一句「这确实很糟」',s:['E','H']},
+  {t:'先分析一下她到底怎么了',s:['B','C']}]},
+ {d:'职场',q:'你手上有一件很好的简历，正在纠结要不要投。',h:'这题测的是你敢不敢。',o:[
+  {t:'投了，总要试',s:['A','C']},
+  {t:'再改改，改到完美再投',s:['G','D']},
+  {t:'先看看有没有内推渠道',s:['B','H']},
+  {t:'算了，现在不是时候',s:['F','E']}]},
+ {d:'日常',q:'周末两天，你最可能——',h:'没有人会知道真实答案。',o:[
+  {t:'把家里彻底收拾一遍',s:['B','A']},
+  {t:'躺着，一整天不下床',s:['F','D']},
+  {t:'约朋友出门吃饭聊天',s:['E','H']},
+  {t:'一个人去看展或者citywalk',s:['G','C']}]},
+ {d:'关系',q:'群发祝福的时候，你——',h:'这条题有点扎，但很好答。',o:[
+  {t:'给每个人都私发一条不一样的',s:['H','E']},
+  {t:'群发，附一个万能句式',s:['C','A']},
+  {t:'发完就忘了还有这回事',s:['D','B']},
+  {t:'发红包，简单直接',s:['B','E']}]},
+ {d:'自我',q:'最难的不是吃苦，是——',h:'最后一题，答完给你一个东西。',o:[
+  {t:'被误解，而且没人愿意听你说',s:['A','C']},
+  {t:'努力了很久，但没人看见',s:['G','D']},
+  {t:'明明很难，还是得装作没事',s:['F','E']},
+  {t:'你想要的，你妈不理解',s:['H','B']}]},
+ {d:'觉醒',q:'如果能重开一次，你最想改掉的是——',h:'最后两题连着看，会出现一条隐藏线。',o:[
+  {t:'还是不知道自己想要什么',s:[]},
+  {t:'我总在等一个不会来的时机',s:['F','D']},
+  {t:'我把自己活成了别人的期待',s:['C','G']},
+  {t:'我一直在赢，但没人知道我累',s:['A','B']}]}
+];
+
+/* ===================================================================
+   ③ 8型 + 隐藏型
+   =================================================================== */
+const TYPES={
+A:{k:'清算者·账本型',t:'「回来收账的」',l:'我不是回来找他的，我是回来收账的。',
+ body:['你不是复仇，你是在做一件极其耗时的事——把"我被亏待了"这个自我身份，一笔一笔写进结算单，然后撕掉。','心理学上这个动作叫<em>叙事重构</em>（narrative reconstruction，Bonanno, 2004）：创伤不是靠遗忘走出来的，是靠重新讲一遍走出来的。同一段经历，换一个主角，意义完全不一样。你正在改写自己故事的作者署名。','底层是罗特的<em>内控型</em>人格（Rotter, 1966）——你相信因果掌握在自己手里。好处是你不会被命运按在地上；坏处是，你会把很多本来不是账的事也记成账。'],
+ blind:['账清了不等于情绪痊愈。你可能追讨完了，依然睡不着。','你用记账的方式处理关系，于是关系变成了应收和应付。有些人根本不在你的账本上——但你还是记着。'],
+ learn:['你以为你在报仇，其实你在练习当自己的作者。这是心理学上被反复验证最有效的自我修复方式。','下次记账时问自己一句：这一笔我讨得回来吗？如果讨不回来，那它不是账，是情绪。'],
+ th:['罗特 内部控制点理论, 1966','创伤后成长 Bonanno, 2004','叙事身份 McAdams & McLean, 2013','Sorkin 与 Amir 的「账单 vs 出气」表达性写作研究'],
+ st:[{n:'初醒 · 记挂期',d:'你还在积累证据。心里有一份名单，谁欠你多少你记得一清二楚。你不缺耐心，你缺的是有人承认这本账存在。'},
+ {n:'成型 · 列账期',d:'你开始把委屈结构化：归类、比价、算总账。这是你厉害的地方，也是危险的地方——你开始用账本看人了。'},
+ {n:'破境 · 清账期',d:'账结清了，你还在原地。这时你才发现最难追讨的那一笔，是当年没有人站你这边。'}]},
+B:{k:'登顶者·塔尖型',t:'「要 title 不要人」',l:'男人会走，职级会留。',
+ body:['你的引擎是<em>胜任</em>。德西与瑞安（Deci & Ryan, 1985）的自我决定理论里，人有三种基本心理需求：自主、胜任、归属。你把八成以上的动力压在胜任这一条上，所以别人的评价你听得进去，别人的陪伴你可以先放一边。','麦利克兰（McClelland, 1961）的成就动机理论说，你被一种叫<em>力求成功</em>的驱力绑住——你不是想赢，你是不想输在"能力不如人"这件事上。','塔尖上风很大，也很空。你不是不需要人，你是没空需要。'],
+ blind:['你把"我在变强"当成唯一的情绪止痛药。可一旦这件事停不下来——升不动了、被看见了、被取代了——你就没有第二支药。','身边的人慢慢搞明白一件事：跟你讲感情没用，跟你讲成绩有用。他们开始只讲成绩。你还觉得挺好。'],
+ learn:['你的抗压不是天赋，是选择——你选了一条最清晰的路：让自己一直有增长。','但"一直有增长"有保质期。真正稀缺的不是职级，是可迁移的能力和不在公司也能吃饭的收入。给自己留第二条线，比再升一级重要。'],
+ th:['自我决定理论 Deci & Ryan, 1985','成就动机 McClelland, 1961','职业自我效能感与主观幸福感 · 相关纵向研究'],
+ st:[{n:'初醒 · 成绩单期',d:'成绩单就是你的安全感来源。你努力的方向很明确：把数字做大，把 title 做厚。'},
+ {n:'成型 · 野心期',d:'你开始享受"被看见"，但也很清楚掌声是给位置的不是给你的。这份清醒让你不容易塌。'},
+ {n:'破境 · 空心期',d:'你已经赢了，但开始觉得没意思。这不是矫情，是典型的意义危机。你需要换赛道，不是换公司。'}]},
+C:{k:'破壁者·疯批型',t:'「发疯文学本人」',l:'我疯起来连自己都打，但我不后悔。',
+ body:['你把"发疯"当成一种<em>策略</em>——用一次可控的失控，换回真实的自己。这不是情绪失控，是情绪粒度（emotional granularity，Barrett, 2017）高到能把愤怒切得很细：哪里是真的怒，哪里是演的。','人格心理学里的<em>暗色三联</em>（Dark Triad，Paulhus & Williams, 2007）指的是批判性思维、自恋、精神变态倾向。你身上批判性思维那一条很突出：你不肯接受"本来就该这样"。这是被很多人当成缺点的东西，其实是推动你离开烂局的核心引擎。'],
+ blind:['外部世界不区分"策略性发疯"和"真的失控"。你解释过的每一次，都还是有人不信。','你的火力是范围伤害的。爽的时候很爽，事后你会花很长时间收拾被你扫到的人——包括无辜的人。'],
+ learn:['你以为疯是一种失控，其实你比谁都清楚自己在干什么。你只是不愿再演那个懂事的人。','但"不发疯"不等于"认输"。你真正要的是选择权，不是情绪的音量。'],
+ th:['暗色三联人格 Paulhus & Williams, 2007','情绪粒度 Barrett, 2017','Gross 的表达性抑制情绪调节模型'],
+ st:[{n:'初醒 · 怼人期',d:'你的愤怒很准，但方向还在乱。你为了赢而打，还没分清哪些仗值得打。'},
+ {n:'成型 · 掀桌期',d:'你发现讲道理没用，开始掀桌。掀一次能换来名气和资源，你确实拿到了你要的东西。'},
+ {n:'破境 · 自洽期',d:'你不闹了。不是被驯服，是不需要用闹来证明什么了。这时的你有一点可怕。'}]},
+D:{k:'观察者·雾里型',t:'「人间清醒，但懒得清醒到底」',l:'我看透了一切，只想安静活着。',
+ body:['你靠"看透"来降低情绪投入。拉扎勒斯（Lazarus, 1991）的认知评价理论认为，你对一件事的解释决定了情绪强度——同样的亏，"他就是那种人"比"他居然这样对我"轻得多。','邓肯与巴雷特（Duncan & Barrett, 2020）关于社交能量池的研究显示：长期维持低唤起的人，不是因为需求低，是因为他们太熟练地把自己的需求调成了静音。','你不是没感觉。你是先算清了"感觉起来划不划算"，才允许自己有感觉。'],
+ blind:['清醒是一种防御机制，不是一个人的全部。你不是不需要投入，你是怕投入之后收不回来。','你的"无所谓"有传染性。你身边那个真正想跟你说话的人，最后也走了。'],
+ learn:['你不生气不是因为修养好，是因为你已经提前把结局想完了。','省下来的情绪能量去了哪儿？它没消失，只是被换算成了"懒得解释"。这套技能在职场是好技能，在亲密关系里是致命的。'],
+ th:['认知评价理论 Lazarus, 1991','社交能量池 Duncan & Barrett, 2020','述情障碍 Alexithymia 研究综述'],
+ st:[{n:'初醒 · 看透期',d:'你已经比身边大多数人看得清。这让你少受很多罪，也少受很多乐。'},
+ {n:'成型 · 隐身期',d:'你学会了不出现。群里不冒头，聚会不迟到也不早到，谁都记得你但没人说得清你最近在干嘛。'},
+ {n:'破境 · 走回来期',d:'某天你意识到：看破和看开是两件事。你选的这条路，终点比你以为的更孤单。'}]},
+E:{k:'存档者·暖光型',t:'「被爱体质，不用学」',l:'我值得被爱，我从来不怀疑这件事。',
+ body:['你的核心信念是"我值得"，这在依恋理论里对应<em>安全型依恋</em>（Bowlby；Hazan & Shaver, 1987）。安全型的关系画像是：我能靠近，也能退开；我不试探，也不消耗。听起来很轻松，其实是天生的稀缺品——很多人三十岁之前都没长出来。','你还有一层<em>自我慈悲</em>的能力（Kristin Neff, 2003）：对自己下手的时候，你会说"我尽力了"，而不是"我怎么这么差"。这一层决定了你的温柔不是讨好。'],
+ blind:['你太习惯当别人的情绪回收站。你的"好"如果一直是你唯一被喜欢的理由，那它就不是优点了，是筹码被人拿住了。','你的危险不在付出多，在于你说不出"不"。你怕的不是得罪人，是怕那个发现你不好相处的人走了。'],
+ learn:['你的温柔不是讨好。讨好是"我怕你不满意"，你的温柔是"我希望你开心"。区别在于后者不需要你委屈自己。','真正的被爱体质，是敢把自己不好看的部分也放上桌。你还在藏着，说明你还没完全信。'],
+ th:['依恋理论 Bowlby / Hazan & Shaver, 1987','自我慈悲 Kristin Neff, 2003','情绪性亲密关系与主观幸福感研究'],
+ st:[{n:'初醒 · 被爱期',d:'你知道自己被爱，所以你敢要。这是一种很健康的大胆。'},
+ {n:'成型 · 照顾期',d:'你成了所有人里最可靠的那个。你记着每个人的忌口、生日、什么时候心情不好。'},
+ {n:'破境 · 索取期',d:'你终于开口说"我也需要"。这一句比前面十八题加起来都难，也是你真正开始被爱的起点。'}]},
+F:{k:'退场者·止损型',t:'「体面消失选手」',l:'我不争了，我退。这不叫输，叫不陪了。',
+ body:['你的止损能力是天生的。铁布纳定律（Iron Law，Humor & Cameron, 2007）说人的理性带宽有限，情绪劳动的成本超过阈值就会崩。你比别人更早算出这笔账值不值得。','这也是<em>沉没成本谬误</em>（Kahneman & Tversky, 1979）的反面向：你能识别它，并在它咬你之前跑掉。很多人摔了三次才学会，你摔一次就走。'],
+ blind:['你退得干脆，也退得容易。有些人摔了三次才学会，你摔一次就走——代价是，很多人还没来得及找到你。','你以为自己在止损，但有时候那是逃。你分不清这两者的区别，因为在当下它们感觉一模一样。'],
+ learn:['你不是懒，你是有过判断。你只是把判断藏起来了，别人以为你无所谓。','下次想走之前问自己一句：如果这件事三个月后自动结束，我还会做吗？会，那就别走。'],
+ th:['有限资源理论（铁布纳定律）Humor & Cameron, 2007','沉没成本谬误 Kahneman & Tversky, 1979','情绪劳动与职业倦怠 Hochschild'],
+ st:[{n:'初醒 · 忍期',d:'你很能忍。别人以为你没关系，其实你在数第几次了。'},
+ {n:'成型 · 退场期',d:'你终于退了。退得干净，没有撕破脸，甚至连告别都没要。'},
+ {n:'破境 · 重启期',d:'你发现退场不是结束，是终于有空重新选一次。这次别再只选省力的选项。'}]},
+G:{k:'暗行者·无声型',t:'「我所有的坦白，都是策略的一部分」',l:'谁都不信，包括我自己。',
+ body:['你收集了大量信息，却很难从中得到松弛。Slovic（2007）的负面偏差研究指出，聪明人会对"可能出事"投入不成比例的注意力——你的谨慎是有认知代价的。','从防御机制角度（Vaillant, 1977 的心理适应层级），你的表层功能很强，能在高压下正常工作，但代价是把情感层也一起关掉了。你不是没有情绪，你是把它归档了。','你不信人，不是因为遇到过坏人，是因为你算过信错的成本——而且算得特别清楚。'],
+ blind:['你把所有关系都保持在"可撤退"的距离上。久而久之，别人觉得你冷，你也不觉得哪里不对。','你的预判准确率很高，所以越来越不需要验证。"我知道是这样"经常替代了"我去看看"。'],
+ learn:['你不是不想信人，你是知道信错的成本。你只是从没遇到过让自己愿意停下来的那个人。','但有一个人值得你破例——就是那个你从来不需要解释的人。他/她存在的话，你早就知道了。'],
+ th:['负面偏差 Slovic, 2007','防御机制成熟层级 Vaillant, 1977','高智商人群的负面认知偏差研究'],
+ st:[{n:'初醒 · 观察期',d:'你永远先看。信息在你手里，别人在你手里，你都不给。'},
+ {n:'成型 · 隐身期',d:'你的存在感很低，但判断很准。你成了那种"他说的没错"的人。'},
+ {n:'破境 · 交底期',d:'你第一次把没把握的事说出来。那比赢任何一局都难。'}]},
+H:{k:'筑墙者·同盟型',t:'「我要的是战友，不是靠山」',l:'一个人扛不住的时候，我不找对象，我找姐妹。',
+ body:['你的韧性不来自"我够强"，来自"我有的人"。House（1981）的社会支持缓冲假说讲得很清楚：真正压垮人的不是压力本身，是压力叠加孤立。有人兜着，同样的压力你能扛三倍。','你的自我是<em>集体自我</em>型的——你的成就里有别人，你的痛苦里也有别人。所以你特别适合当那个扛事的人，也特别容易被"你怎么什么都自己扛"这句话扎到。'],
+ blind:['你太习惯当扛事的那个人。身边所有人都默认你不需要帮忙，这成了你的隐形标签。','你把"我能扛"当成社交货币，这让你很难开口，也很难被真正看见。'],
+ learn:['你以为你在帮别人，其实你在建一个你愿意被接住的地方。这两件事是一件事。','下次扛不动的时候，试一句"我今天有点不行"。你会发现，整栋楼都没塌。'],
+ th:['社会支持缓冲假说 House, 1981','集体自我 · 文化心理学视角','亲社会行为与自我价值感研究'],
+ st:[{n:'初醒 · 组队期',d:'你天然知道谁靠得住。你的社交是有目的的，不是无效社交。'},
+ {n:'成型 · 扛事期',d:'你成了所有人的默认求助对象。你享受，但也累了。'},
+ {n:'破境 · 交棒期',d:'你终于让别人接了一次手。这一步比任何升职都难。'}]},
+Z:{k:'执笔人 · 自撰型',t:'「我不演了，我自己写」',l:'别人的剧本再好，也是别人写的。',
+ body:['你把人生从"正在经历的事"改写成"正在创作的作品"。这个能力在心理学里有正式名字：<em>叙事身份理论</em>（Narrative Identity Theory，McAdams & McLean, 2013）——人的自我，本质就是一组关于"我是谁、我经历了什么、我要去哪"的故事。','大多数人是被动接收剧本：原生家庭给的、婚姻给的、职场给的。只有极少数人意识到自己在笔尖上。你选了那一题里最不常见的答案。'],
+ blind:['自己写的剧本，也只有你能改。你不能指望别人看懂你在写什么，这会变成一种新型的孤独。','自由是有代价的。选了执笔，就没有"都怪剧本"这个选项了——所有结果都得你自己认。'],
+ learn:['你不是比谁自由，你只是比谁更早承认：人生是你在写，不是你在被写。','但今天我发现一个 bug：我不小心又按别人给的选项走了一遍。所以这一项我改。'],
+ th:['叙事身份理论 McAdams & McLean, 2013','自我叙事与适应 Bonanno 叙事重构','自主性需求与幸福感双模型 Deci & Ryan, 2000'],
+ unlock:'你在最后一题选了「还是不知道自己想要什么」，同时在「周末两天」那题选了「一个人去看展或者citywalk」。这两题的中文里有个共同的字——一个人。多数人在这两题分别选了 D 和 C，把原因归给时机、归给没人看见。你选了两次「一个人」。',
+ st:[{n:'初醒 · 执笔期',d:'你开始意识到，很多事之所以必须发生，是因为你一直在配合它发生。'},
+ {n:'成型 · 改稿期',d:'你反复删改自己的过去。删到某一段，怎么改都别扭——那就是你的核心信念，它在撑着整个故事。'},
+ {n:'破境 · 定稿期',d:'你不再改稿了。不是认了，是你确认这版是自己写的。'}]}
+};
+const KEYS=['A','B','C','D','E','F','G','H'];
+const MAXS={A:20,B:18,C:20,D:14,E:18,F:16,G:17,H:19};
+
+/* ===================================================================
+   ④ 计分
+   =================================================================== */
+function score(ans){
+ const s={A:0,B:0,C:0,D:0,E:0,F:0,G:0,H:0};
+ // 隐藏型需要两个条件同时成立：末题选「不知道自己想要什么」 + 周末题选「一个人去看展」
+ const hid=(ans[17]===0)&&(ans[14]===3);
+ ans.forEach((ai,i)=>{const o=QUESTIONS[i].o[ai]; o.s.forEach(k=>s[k]++);});
+ if(hid) return {key:'Z',s:s,top:'Z',margin:0,ratio:1,rare:2};
+ const o=KEYS.slice().sort((x,y)=>s[y]-s[x]);
+ const top=o[0],margin=s[top]-s[o[1]],ratio=s[top]/MAXS[top];
+ const rare=Math.max(2,Math.min(48,Math.round(46-margin*4.6-(ratio>0.62?6:0))));
+ return {key:top,s:s,top:top,margin:margin,ratio:ratio,rare:rare};
+}
+const stageOf=r=>(r<0.34?0:r<0.58?1:2);
+
+/* ===================================================================
+   ⑤ 状态
+   =================================================================== */
+const SC=document.getElementById('screen'), MR=document.getElementById('modalRoot'), TS=document.getElementById('toast');
+let cur=0, ans=[], res=null;
+function toast(m){TS.textContent=m;TS.classList.add('on');clearTimeout(TS._t);TS._t=setTimeout(()=>TS.classList.remove('on'),2400);}
+
+/* ---------- 密码 ---------- */
+function usedCount(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||'{}')}catch(e){return{}}}
+function usedOf(p){return usedCount()[p]||0}
+function markUse(p){const o=usedCount();o[p]=(o[p]||0)+1;try{localStorage.setItem(STORE_KEY,JSON.stringify(o))}catch(e){}}
+
+function lockScreen(msg,left,locked,lim){
+ lim = lim || MAX_TIMES;
+ SC.innerHTML=`<div class="lock">
+  <div class="mark">测</div>
+  <h1>请输入访问密码</h1>
+  <p class="tip">本测评每个密码限 ${lim} 次使用</p>
+  <input id="pwd" type="text" inputmode="text" autocomplete="off" placeholder="输入密码" ${locked?'disabled':''} autocapitalize="characters" spellcheck="false">
+  <div class="msg">${msg||''}</div>
+  <div class="left">${left!=null?('剩余可用次数：'+Math.max(0,lim-left)):''}</div>
+  <button class="btn" id="go" ${locked?'disabled':''}>开 始</button>
+  <div class="warn">提示：${SB?'次数由云端数据库统一记录，换设备、开无痕也刷不掉':'访问次数按浏览器本地记录。若在无痕模式或更换设备后重置，说明这是前端校验，无法阻止技术手段的绕过——仅用于控制正常用户的转发扩散'}。</div>
+ </div>`;
+ const inp=document.getElementById('pwd');
+ setTimeout(()=>inp&&inp.focus(),100);
+ inp&&inp.addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+ document.getElementById('go').onclick=check;
+ let busy=false;
+ function check(){
+  const v=inp.value.trim(); if(!v||busy)return;
+  const pw=v.toUpperCase();
+  if(SB){ checkCloud(pw); return; }
+  /* ---- 本地模式 ---- */
+  if(!PWDSET.size){
+    return lockScreen('密码表未加载：请配置 config.js（云端）或放置 passwords.js 后刷新',null,true);
+  }
+  const h=fnv(pw);
+  if(!PWDSET.has(h)){
+    inp.classList.add('err');setTimeout(()=>inp.classList.remove('err'),350);
+    return lockScreen('密码不对',null,false);
+  }
+  const my=PMAP[h]||lim;
+  const c=usedOf(pw);
+  if(c>=my){return lockScreen('该密码使用次数已用完',0,true,my);}
+  markUse(pw); cover();
+ }
+ /* ---- 云端模式：Supabase RPC 校验 + 原子扣次 ---- */
+ async function checkCloud(pw){
+  const btn=document.getElementById('go');
+  busy=true;
+  if(btn){btn.disabled=true;btn.textContent='验证中…';}
+  try{
+    const r = await SB.rpc('verify_password', { p_pwd: pw, p_ip: '' });
+    // 返回 {ok, enter, left, max, throttled?}
+    const o = Array.isArray(r) ? r[0] : r;
+    if(o && o.throttled){
+      return lockScreen('尝试过于频繁，请几分钟后再试',null,false);
+    }
+    if(!o || !o.ok){
+      inp.classList.add('err');setTimeout(()=>inp.classList.remove('err'),350);
+      return lockScreen('密码不对',null,false);
+    }
+    if(!o.enter){
+      return lockScreen('该密码使用次数已用完',0,true,o.max||3);
+    }
+    markUse(pw); cover();
+  }catch(e){
+    console.error('[密码] 云端校验失败', e);
+    // 云端故障时回落本地表（若可用），否则提示
+    if(PWDSET.size){
+      const h=fnv(pw);
+      if(PWDSET.has(h)){
+        const my=PMAP[h]||lim;
+        const c=usedOf(pw);
+        if(c<my){ markUse(pw); return cover(); }
+        return lockScreen('该密码使用次数已用完',0,true,my);
+      }
+      inp.classList.add('err');setTimeout(()=>inp.classList.remove('err'),350);
+      return lockScreen('密码不对（云端暂不可用，已用本地校验）',null,false);
+    }
+    return lockScreen('云端校验失败：'+e.message.slice(0,80),null,false);
+  }finally{
+    busy=false;
+  }
+ }
+}
+
+/* ---------- 封面 ---------- */
+function cover(){
+ SC.innerHTML=`<div class="cover">
+  <div class="kicker">大 女 主 剧 本 鉴</div>
+  <h1>你拿的是<br><em>哪一版大女主剧本</em></h1>
+  <div class="rule"></div>
+  <p class="sub">18 道题，8 种剧本，外加一个很少有人能解锁的第 9 种。<br>不比别人，只比你自己写过的那一版。</p>
+  <button class="btn" onclick="start()">开 始 测 试</button>
+  <div class="meta">18 题 · 5 个维度 · 9 种结局<br>大约 90 秒</div>
+ </div>`;
+}
+function start(){cur=0;ans=[];render();}
+
+/* ---------- 答题 ---------- */
+function render(){
+ const q=QUESTIONS[cur],pct=(cur/QUESTIONS.length*100).toFixed(1);
+ SC.innerHTML=`<div class="page">
+  <div class="qhead"><span>${q.d}</span><span>${cur+1} / ${QUESTIONS.length}</span></div>
+  <div class="pbar"><i style="width:${pct}%"></i></div>
+  <h2 class="qtitle">${q.q}</h2><p class="qhint">${q.h}</p>
+  ${q.o.map((o,i)=>`<button class="opt${ans[cur]===i?' sel':''}" onclick="pick(${i})">${o.t}</button>`).join('')}
+  <div class="qfoot">
+   <button onclick="back()">${cur===0?'退出':'上一题'}</button>
+   ${ans.length>cur?`<button class="lockbtn" onclick="next()">${cur===QUESTIONS.length-1?'看结果':'下一题'}</button>`:'<span></span>'}
+  </div></div>`;
+ window.scrollTo(0,0);
+}
+function pick(i){ans[cur]=i;render();}
+function next(){ if(cur===QUESTIONS.length-1){res=score(ans);result();return;} cur++;render(); }
+function back(){ if(cur===0){cover();return;} cur--;render(); }
+
+/* ---------- 结果 ---------- */
+function result(){
+ const T=TYPES[res.key],g=stageOf(res.ratio),isZ=res.key==='Z';
+ let grid='';
+ if(isZ) grid=`<p style="font-size:13px;color:var(--ink2)">你解锁了第 9 种。它的触发条件不是分数，而是你在最后一题的选择。</p>`;
+ else{
+  const order=KEYS.slice().sort((x,y)=>res.s[y]-res.s[x]);
+  grid=`<p style="font-size:13px;color:var(--ink2);margin-bottom:12px">你的分数分布——得分最高的一栏就是你的剧本。</p><div class="grid8">`+
+   order.map(k=>`<div class="g8item${k===res.top?' on':''}"><b>${TYPES[k].k}</b><span>${res.s[k]} / ${MAXS[k]}</span></div>`).join('')+`</div>`;
+ }
+ SC.innerHTML=`<div class="page">
+ <div class="hero">
+  <div class="kicker">${isZ?'H I D D E N　·　解 锁':'你 的 剧 本'}</div>
+  <div class="type">${T.k}</div><div class="title">${T.t}</div>
+  <div class="line">${T.l}</div>
+  <div class="badges"><span class="badge hl">${T.st[g].n.split(' · ')[1]}</span>
+  <span class="badge">稀有度 前 ${res.rare}%</span>
+  <span class="badge">${isZ?'隐藏结果':'主导型 '+res.top}</span></div>
+ </div>
+ <div class="divider"></div>
+ ${T.unlock?`<div class="sec"><h3>解 锁 条 件</h3><div class="quote">${T.unlock}</div></div>`:''}
+ <div class="sec"><h3>你 在 剧 本 里 怎 么 活</h3>${T.body.map(x=>`<p>${x}</p>`).join('')}</div>
+ <div class="sec"><h3>你 的 盲 区</h3>${T.blind.map(x=>`<p>${x}</p>`).join('')}</div>
+ <div class="sec"><h3>你 带 走 的 东 西</h3><div class="quote">${T.learn[0]}</div><p style="margin-top:14px">${T.learn[1]}</p></div>
+ <div class="divider"></div>
+ <div class="sec"><h3>三 个 阶 段 · 你 在 第 几 段</h3><div class="stages">
+  ${T.st.map((s,i)=>`<div class="stage${i===g?' on':''}"><h4>${s.n}${i===g?'<em>你在这</em>':''}</h4><p>${s.d}</p></div>`).join('')}
+ </div></div>
+ <div class="sec"><h3>结 果 长 图</h3><img id="shot" alt="结果长图">
+  <div class="acts">
+   <button class="primary" onclick="saveShot()">保存 / 转发长图</button>
+   <button class="secondary" onclick="copyLink()">复制结果链接</button>
+   <button class="secondary" onclick="start()">再测一次</button>
+   <button class="secondary" onclick="goodReview()">好评有礼</button>
+  </div>
+ </div>
+ <div class="sec"><h3>理 论 出 处</h3>
+  <details class="acc"><summary>这套结果是怎么算出来的</summary><div class="body"><ul>
+  ${T.th.map(t=>`<li>· ${t}</li>`).join('')}<li class="disc">· 稀有度与阶段为趣味化呈现，非临床测评结果</li></ul></div></details>
+ </div>
+ <div class="sec"><h3>八 种 剧 本 都 长 什 么 样</h3>${grid}</div>
+ <div class="foot">本测评基于自我决定理论、依恋理论、叙事身份理论等公开研究构建<br>仅供自我参照，不构成心理诊断</div>
+ </div>`;
+ window.scrollTo(0,0);
+ buildShot(T,g);
+ window._shotUrl=null;
+}
+
+/* ---------- 分享链接 ---------- */
+function encodeAns(){
+ let s=''; ans.forEach((a,i)=>s+=String.fromCharCode(48+a));
+ return btoa(s).replace(/=+$/,'');
+}
+function shareURL(){
+ const u=new URL(location.href); u.hash='r='+encodeAns(); return u.toString();
+}
+function copyLink(){
+ const u=shareURL();
+ const done=()=>toast('链接已复制，发给朋友就能看到你的结果');
+ if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(u).then(done).catch(()=>fallback());}
+ else fallback();
+ function fallback(){
+  const i=document.createElement('textarea');i.value=u;
+  i.style.cssText='position:fixed;top:-999px';document.body.appendChild(i);i.select();
+  try{document.execCommand('copy');done();}catch(e){toast('复制失败，请手动复制地址栏');}
+  document.body.removeChild(i);
+ }
+}
+
+/* ---------- 好评弹窗 ---------- */
+function goodReview(){
+ MR.innerHTML=`<div class="mask" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+   <h4>好评有礼</h4>
+   <p class="mp">店铺好评后，请联系客服并发送好评截图，即可获得 <b>1 元返现</b>。</p>
+   <div class="row"><button class="secondary" onclick="closeModal()">知道了</button></div>
+  </div></div>`;
+}
+function closeModal(){MR.innerHTML=''}
+
+/* ---------- 长图 ---------- */
+function saveShot(){
+ if(!window._shotUrl){toast('图片还在生成，请稍等一下');return;}
+ const a=document.createElement('a');
+ a.href=window._shotUrl; a.download='大女主剧本-'+TYPES[res.key].k.replace(/[·\s]/g,'')+'.png';
+ document.body.appendChild(a); a.click(); document.body.removeChild(a);
+ toast(isIOS()?'长按上方图片可保存到相册':'已保存，可直接分享');
+}
+function isIOS(){return /iPhone|iPad|iPod/i.test(navigator.userAgent)}
+
+function buildShot(T,g){
+ const W=1080,H=1560,S=2;
+ const c=document.createElement('canvas');c.width=W*S;c.height=H*S;
+ const x=c.getContext('2d');x.scale(S,S);
+ x.fillStyle='#F7F2E8';x.fillRect(0,0,W,H);
+ x.strokeStyle='rgba(28,26,23,.16)';x.lineWidth=2;x.strokeRect(34,34,W-68,H-68);
+ x.strokeStyle='rgba(168,134,78,.42)';x.lineWidth=1;x.strokeRect(46,46,W-92,H-92);
+
+ x.textAlign='center';
+ x.fillStyle='#A8864E';x.font='300 21px "PingFang SC",sans-serif';
+ x.letterSpacing='10px';x.fillText('大 女 主 剧 本 鉴',W/2,126);x.letterSpacing='0px';
+ x.strokeStyle='#A8864E';x.beginPath();x.moveTo(W/2-38,160);x.lineTo(W/2+38,160);x.stroke();
+
+ x.fillStyle='#1C1A17';x.font='600 66px "PingFang SC",sans-serif';
+ x.fillText(T.k.split('·')[0].trim(),W/2,262);
+ x.fillStyle='#9E2B25';x.font='400 29px "PingFang SC",sans-serif';
+ x.fillText(T.t,W/2,322);
+
+ x.fillStyle='rgba(28,26,23,.07)';x.fillRect(118,376,W-236,2);
+
+ x.fillStyle='#1C1A17';x.font='500 33px "PingFang SC",sans-serif';
+ wrap(x,T.l,W/2,452,850,50);
+
+ x.fillStyle='#5A5348';x.font='400 23px "PingFang SC",sans-serif';
+ wrap(x,T.blind[0],W/2,650,770,40);
+
+ x.fillStyle='rgba(158,43,37,.07)';rr(x,W/2-340,838,680,92,4);x.fill();
+ x.strokeStyle='rgba(158,43,37,.32)';x.lineWidth=1;rr(x,W/2-340,838,680,92,4);x.stroke();
+ x.fillStyle='#9E2B25';x.font='500 25px "PingFang SC",sans-serif';
+ x.fillText(T.st[g].n,W/2,890);
+
+ x.fillStyle='#5A5348';x.font='400 23px "PingFang SC",sans-serif';
+ x.fillText('稀有度 前 '+res.rare+'%　·　18 题 / 5 维度',W/2,984);
+
+ if(res.key==='Z'){
+  x.fillStyle='rgba(158,43,37,.05)';rr(x,180,1042,720,92,4);x.fill();
+  x.strokeStyle='rgba(158,43,37,.3)';rr(x,180,1042,720,92,4);x.stroke();
+  x.fillStyle='#9E2B25';x.font='500 26px "PingFang SC",sans-serif';
+  x.fillText('隐藏结果 · 第 9 种剧本',W/2,1098);
+ }else{
+  const order=KEYS.slice().sort((a,b)=>res.s[b]-res.s[a]);
+  const cw=196,ch=76,gx=20,gy=16;
+  const sx=(W-(4*cw+3*gx))/2,sy=1044;
+  order.forEach((k,i)=>{
+   const r=Math.floor(i/4),cx=i%4,bx=sx+cx*(cw+gx),by=sy+r*(ch+gy),on=k===res.top;
+   x.fillStyle=on?'rgba(158,43,37,.08)':'rgba(255,255,255,.55)';rr(x,bx,by,cw,ch,3);x.fill();
+   x.strokeStyle=on?'rgba(158,43,37,.38)':'rgba(28,26,23,.11)';x.lineWidth=1;rr(x,bx,by,cw,ch,3);x.stroke();
+   x.fillStyle=on?'#9E2B25':'#1C1A17';x.font='500 23px "PingFang SC",sans-serif';
+   x.fillText(TYPES[k].k.split('·')[0].trim(),bx+cw/2,by+34);
+   x.fillStyle='#8C8478';x.font='400 19px "PingFang SC",sans-serif';
+   x.fillText(res.s[k]+' / '+MAXS[k],bx+cw/2,by+59);
+  });
+ }
+ x.fillStyle='#8C8478';x.font='400 20px "PingFang SC",sans-serif';
+ x.fillText('你的剧本，由你执笔',W/2,1444);
+
+ const url=c.toDataURL('image/png');
+ const img=document.getElementById('shot'); if(img)img.src=url;
+ window._shotUrl=url;
+}
+function rr(x,px,py,w,h,r){x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath();}
+function wrap(x,txt,cx,y,maxw,lh){const ch=txt.split('');let ln='',yy=y;for(let i=0;i<ch.length;i++){const t=ln+ch[i];if(x.measureText(t).width>maxw){x.fillText(ln,cx,yy);ln=ch[i];yy+=lh;}else ln=t;}x.fillText(ln,cx,yy);}
+
+/* ---------- 读取分享链接 ---------- */
+function loadFromHash(){
+ const m=location.hash.match(/r=([A-Za-z0-9+/]+)/);
+ if(!m)return false;
+ try{
+  const raw=atob(m[1]); if(raw.length!==QUESTIONS.length)return false;
+  const a=[]; for(let i=0;i<raw.length;i++){const v=raw.charCodeAt(i)-48; if(v<0||v>3)return false; a.push(v);}
+  ans=a; res=score(ans); cur=QUESTIONS.length; result(); return true;
+ }catch(e){return false}
+}
+
+/* ---------- 启动 ---------- */
+(function boot(){
+ addEventListener('hashchange',()=>{ if(location.hash.indexOf('r=')===1){ if(!res) loadFromHash(); }});
+ if(!loadFromHash()) lockScreen();
+})();
+</script>
+</body>
+</html>
